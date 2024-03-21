@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 #1 Import Necessary Libraries:
@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 from keras.datasets import cifar10
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import to_categorical
-from keras.mo+dels import Sequential
+from keras.models import Sequential
 from keras.layers import Dense, Conv2D, MaxPooling2D
 from keras.layers import Dropout, Flatten, BatchNormalization
 from keras.regularizers import l2
@@ -25,21 +25,21 @@ from keras.callbacks import ReduceLROnPlateau, EarlyStopping
 from keras.models import load_model
 
 
-# In[4]:
+# In[2]:
 
 
 #2 Download CIFAR-10 dataset from keras library:
 (X_train, y_train), (X_test, y_test) = cifar10.load_data()
 
 
-# In[5]:
+# In[3]:
 
 
 #3 Split original training data to training and validation sets:
 X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=0.1, random_state=0)
 
 
-# In[6]:
+# In[4]:
 
 
 #4 Printing out the dimensions of our training, validation, and test datasets:
@@ -53,7 +53,7 @@ print('\nTest Images Shape:       ', X_test.shape)
 print('Test Labels Shape:       ', y_test.shape)
 
 
-# In[7]:
+# In[5]:
 
 
 #5  Let's take an overview of the CIFAR-10 dataset:
@@ -83,13 +83,13 @@ for i in range(64):
 plt.show()
 
 
-# In[8]:
+# In[6]:
 
 
 #6 Data Preprocessing
 
 
-# In[9]:
+# In[7]:
 
 
 #6.1 Normalization of Image Data
@@ -114,7 +114,7 @@ X_test  = (X_test-mean) /(std+1e-7)
 X_valid = (X_valid-mean)/(std+1e-7)
 
 
-# In[10]:
+# In[8]:
 
 
 #6.2 One-Hot Encoding of Labels
@@ -127,7 +127,7 @@ y_valid = to_categorical(y_valid, 10)
 y_test  = to_categorical(y_test, 10)
 
 
-# In[11]:
+# In[9]:
 
 
 #6.3 Data Augmentation
@@ -160,7 +160,7 @@ data_generator = ImageDataGenerator(
 
 
 
-# In[12]:
+# In[10]:
 
 
 #7 Define CNN Model Architecture
@@ -224,7 +224,7 @@ model.add(Dense(10, activation='softmax'))
 
 
 
-# In[13]:
+# In[11]:
 
 
 model.summary()
@@ -268,8 +268,10 @@ model.fit(data_generator.flow(X_train, y_train, batch_size=batch_size),
           verbose=2)
 
 
-# In[ ]:
+# In[15]:
 
+
+#9 Visualizing the Learning Curves over epochs using model history
 
 plt.figure(figsize=(15,6))
 
@@ -288,4 +290,71 @@ plt.legend()
 plt.title('Accuracy Evolution')
 
 plt.show()
+
+
+# In[17]:
+
+
+#10 Use the model to make predictions, evaluate on test data
+test_loss, test_acc = model.evaluate(X_test, y_test, verbose=1)
+
+print('\nTest Accuracy:', test_acc)
+print('Test Loss:    ', test_loss)
+
+
+# In[18]:
+
+
+#11 Fetch the raw image from GitHub
+url = "https://raw.githubusercontent.com/FarzadNekouee/Keras-CIFAR10-CNN-Model/master/truck_sample.png"
+resp = urllib.request.urlopen(url)
+image = np.asarray(bytearray(resp.read()), dtype="uint8")
+image = cv2.imdecode(image, cv2.IMREAD_UNCHANGED)
+
+# Convert the image from BGR to RGB
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+
+# In[19]:
+
+
+#12 Display the image
+plt.imshow(image)
+plt.xticks([])
+plt.yticks([])
+plt.grid(False)
+plt.show()
+
+
+# In[20]:
+
+
+#13 Resize it to 32x32 pixels
+image = cv2.resize(image, (32,32))
+
+# Normalize the image
+image = (image-mean)/(std+1e-7)
+
+# Add an extra dimension because the model expects a batch of images
+image = image.reshape((1, 32, 32, 3))
+
+
+# In[21]:
+
+
+prediction = model.predict(image)
+
+
+# In[22]:
+
+
+predicted_class = prediction.argmax()
+
+print('Predicted class: ', class_names[predicted_class])
+
+
+# In[ ]:
+
+
+
 
