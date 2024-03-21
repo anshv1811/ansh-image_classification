@@ -5,3 +5,4 @@ pandas
 keras
 matplotlib
 opencv-python
+scikit-learn
