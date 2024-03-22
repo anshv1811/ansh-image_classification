@@ -239,7 +239,7 @@ model.summary()
 batch_size = 64
 
 # Set the maximum number of epochs for the training
-epochs = 300
+epochs = 100
 
 # Define the optimizer (Adam)
 optimizer = Adam(learning_rate=0.0005)
